@@ -9,10 +9,19 @@ GEN := generated
 
 default: all
 
+CROSS_COMPILE = arm-linux-
+CC = $(CROSS_COMPILE)gcc
+LD = $(CROSS_COMPILE)gcc
+AR = $(CROSS_COMPILE)ar
+STRIP = $(CROSS_COMPILE)strip
+CFLAGS += -O3 -mfpu=neon -mcpu=cortex-a8 -mfloat-abi=softfp -ftree-vectorize -ffast-math -fsingle-precision-constant
+CROSSCOMPILE = yes
+NOX11 = yes
+CFLAGS += -Wall -pipe -O2 -DNDEBUG -fomit-frame-pointer
 CFLAGS += -Ifitz -Ipdf -Ixps -Iscripts
+LDFLAGS = -static
 LIBS += -lfreetype -ljbig2dec -ljpeg -lopenjpeg -lz -lm
 
-include Makerules
 include Makethird
 
 THIRD_LIBS := $(FREETYPE_LIB)
@@ -31,7 +40,7 @@ endif
 
 CC_CMD = $(QUIET_CC) $(CC) $(CFLAGS) -o $@ -c $<
 AR_CMD = $(QUIET_AR) $(AR) cru $@ $^
-LINK_CMD = $(QUIET_LINK) $(CC) $(LDFLAGS) -o $@ $^ $(LIBS)
+LINK_CMD = $(QUIET_LINK) $(CC) $(LDFLAGS) -o $@ $^ $(LIBS) && $(STRIP) -s $@
 MKDIR_CMD = $(QUIET_MKDIR) mkdir -p $@
 
 # --- Rules ---
@@ -122,7 +131,7 @@ $(OUT)/cmapdump.o : pdf/pdf_cmap.c pdf/pdf_cmap_parse.c
 
 # --- Tools and Apps ---
 
-PDF_APPS := $(addprefix $(OUT)/, pdfdraw pdfclean pdfextract pdfinfo pdfshow)
+PDF_APPS := $(addprefix $(OUT)/, pdf2jpeg pdfdraw pdfclean pdfextract pdfinfo pdfshow)
 XPS_APPS := $(addprefix $(OUT)/, xpsdraw)
 
 $(PDF_APPS) : $(MUPDF_LIB) $(FITZ_LIB) $(THIRD_LIBS)

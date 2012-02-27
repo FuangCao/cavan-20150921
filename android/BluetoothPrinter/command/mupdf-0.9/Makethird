@@ -140,6 +140,20 @@ JPEG_SRC := \
 	jquant1.c \
 	jquant2.c \
 	jutils.c \
+	jcapimin.c \
+	jcparam.c \
+	jcapistd.c \
+	jcmarker.c \
+	jcinit.c \
+	jcmaster.c \
+	jccolor.c \
+	jcsample.c \
+	jcprepct.c \
+	jcdctmgr.c \
+	jcarith.c \
+	jchuff.c \
+	jccoefct.c \
+	jcmainct.c
 
 $(JPEG_LIB): $(addprefix $(OUT)/jpeg_, $(JPEG_SRC:%.c=%.o))
 $(OUT)/jpeg_%.o: $(JPEG_DIR)/%.c | $(OUT)
