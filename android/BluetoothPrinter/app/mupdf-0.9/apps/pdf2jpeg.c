@@ -78,11 +78,19 @@ static fz_error fz_write_jpeg_fp(fz_pixmap *pixmap, FILE *fp)
 static fz_error fz_write_jpeg(fz_pixmap *pixmap, const char *filename)
 {
 	fz_error ret;
+	FILE *fp;
 
-	FILE *fp = fopen(filename, "wb");
-	if (fp == NULL)
+	if (filename)
 	{
-		return fz_throw("open file '%s' failed!", filename);
+		fp = fopen(filename, "wb");
+		if (fp == NULL)
+		{
+			return fz_throw("open file '%s' failed!", filename);
+		}
+	}
+	else
+	{
+		fp = stdout;
 	}
 
 	ret = fz_write_jpeg_fp(pixmap, fp);
@@ -223,11 +231,13 @@ int main(int argc, char *argv[])
 	pdf_xref *xref;
 	const char *pdffile;
 	const char *jpgfile;
+	int pagenum;
 
-	assert(argc > 2);
+	assert(argc > 1);
 
 	pdffile = argv[1];
-	jpgfile = argc > 2 ? argv[2] : NULL;
+	pagenum = argc > 2 ? text2value(argv[2], 10) : -1;
+	jpgfile = argc > 3 ? argv[3] : NULL;
 
 	error = pdf_open_xref(&xref, pdffile, NULL);
 	if (error)
@@ -237,7 +247,14 @@ int main(int argc, char *argv[])
 	if (error)
 		die(fz_rethrow(error, "cannot load page tree: %s", pdffile));
 
-	drawpage(xref, jpgfile, 13);
+	if (pagenum < 0)
+	{
+		printf("%d", xref->page_len);
+	}
+	else
+	{
+		drawpage(xref, jpgfile, pagenum);
+	}
 
 	pdf_free_xref(xref);
 
